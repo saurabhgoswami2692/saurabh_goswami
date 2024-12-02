@@ -12,15 +12,37 @@ const Register = () => {
     };
 
     const [member, setMembers] = useState(members);
+    const [errors,setErrors] = useState({
+        name:false,
+        email:false,
+        password:false
+    });
 
     const inputHandler = (e) => {
         const { name, value } = e.target
         setMembers({ ...member, [name]: value });
+
+        if(value.trim() !== ""){
+            setErrors({...errors, [name]:false});
+        }
     }
 
     const submitForm = async (e) => {
         
         e.preventDefault();
+        
+        const newErrors = {
+            name: member.name.trim() === "",
+            email: member.email.trim() === "",
+            password: member.password.trim() === ""
+        };
+
+        setErrors(newErrors);
+
+        if(Object.values(newErrors).some(error => error)){
+            return;
+        }
+
         await axios.post("http://localhost:8000/api/member", member)
             .then((response) => {
                 toast.success(response.data.message, { position: "top-right" });
@@ -55,6 +77,9 @@ const Register = () => {
                                 placeholder="Enter name"
                                 required
                             />
+                            {errors.name && (
+                                <span class="text-danger">*Please enter your name.</span>
+                            )}
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputEmail" class="form-label">Email</label>
@@ -68,6 +93,10 @@ const Register = () => {
                                 placeholder="Enter email"
                                 required
                             />
+                            {errors.email && (
+                                <span class="text-danger">*Please enter your email.</span>
+                            )}
+
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputPassword" class="form-label">Password</label>
@@ -81,6 +110,10 @@ const Register = () => {
                                 placeholder="Enter password"
                                 required
                             />
+                            {errors.password && (
+                                <span class="text-danger">*Please enter your password.</span>
+                            )}
+
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Register</button>
