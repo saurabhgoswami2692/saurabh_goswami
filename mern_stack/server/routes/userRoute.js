@@ -1,7 +1,7 @@
 import express from "express";
 
 import { create, deleteUser, getAllUsers, getClosedTickets, getOpenTickets, getTotalUsers, getUserById, update } from "../controller/userController.js";
-import { create_member, login } from "../controller/memberController.js";
+import { create_member, login, logout } from "../controller/memberController.js";
 
 
 const route = express.Router();
@@ -17,6 +17,8 @@ route.get('/open-tickets',getOpenTickets);
 
 route.post('/member',create_member);
 route.post('/login',login);
+route.get('/logout',logout);
+
 
 route.get('/session',(req,res) => {
     if(req.session.user){

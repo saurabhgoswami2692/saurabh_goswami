@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react"
 import Header from "../header/Header";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 const Dashboard = () => {
 
+    const navigate = useNavigate();
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalClosedTickets, settotalClosedTickets] = useState(0);
     const [totalOpenTickets, settotalOpenTickets] = useState(0);
 
-    const fetchTotalUsers = async () => {
+    const fetchTotalUsers = async() => {
         try {
             const response = await axios.get('http://localhost:8000/api/total-users');
             // console.log(response);
@@ -38,10 +41,14 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
+        const session = localStorage.getItem('session');
+        if(session){
+            navigate('/admin');
+        }
         fetchTotalUsers();
         fetchClosedTickets();
         fetchOpenTickets();
-    });
+    },[navigate]);
 
     return (
         <div>

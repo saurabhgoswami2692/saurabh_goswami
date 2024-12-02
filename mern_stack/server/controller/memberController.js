@@ -65,3 +65,7 @@ const jwtSecret = process.env.JWT_SECRET;
         console.log("Error generated",error.message);
     }   
 }
+
+export const logout = async(req,res) => {
+    console.log('Test logout');
+}

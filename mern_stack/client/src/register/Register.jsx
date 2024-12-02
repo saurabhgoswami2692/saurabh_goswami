@@ -19,7 +19,7 @@ const Register = () => {
     }
 
     const submitForm = async (e) => {
-
+        
         e.preventDefault();
         await axios.post("http://localhost:8000/api/member", member)
             .then((response) => {

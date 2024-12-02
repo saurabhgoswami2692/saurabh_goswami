@@ -5,128 +5,137 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from 'react-hot-toast';
 const EditUser = () => {
     const users = {
-        name:"",
-        email:"",
-        address:"",
+        name: "",
+        email: "",
+        address: "",
     };
 
-    const [user,setUser] = useState(users)
-    const {id} = useParams();
+    const [user, setUser] = useState(users)
+    const { id } = useParams();
     const navigate = useNavigate();
 
     const inputHandler = (e) => {
-        const {name,value} = e.target
-        setUser({...user,[name]: value});
+        const { name, value } = e.target
+        setUser({ ...user, [name]: value });
     };
 
-    useEffect(()=> {
+    useEffect(() => {
         axios.get(`http://localhost:8000/api/user/${id}`)
-        .then((response)=>{
-            setUser(response.data);
-        })
-        .catch((error)=>{
-            console.log(error);
-        });
-    },[id]);
+            .then((response) => {
+                setUser(response.data);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    }, [id]);
 
-    const submitForm = async(e) => {
+    const submitForm = async (e) => {
         e.preventDefault();
-        await axios.put(`http://localhost:8000/api/update/${id}`,user)
-        .then((response)=>{
-            toast.success(response.data.message,{position:"top-right"});
-            navigate("/users");
-        })
-        .catch((error)=>{
-            console.log(error);
-        })
+        await axios.put(`http://localhost:8000/api/update/${id}`, user)
+            .then((response) => {
+                toast.success(response.data.message, { position: "top-right" });
+                navigate("/users");
+            })
+            .catch((error) => {
+                console.log(error);
+            })
     }
 
-    return (
-        <div>
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      const day = String(date.getDate()).padStart(2,'0');
+      const month = String(date.getMonth() + 1).padStart(2,'0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+    } 
 
-            <Header />
-            <div class="container my-5">
-        <h6 class="d-flex justify-content-center">Update</h6>
-        <div class="d-flex justify-content-center align-items-center center-container">
-            <div class="col-md-4 border rounded">
-                <form class="m-3" onSubmit={submitForm}>
-                    <div class="form-group p-2">
-                        <label for="exampleInputName">Name</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="exampleInputName"
-                            value={user.name}
-                            name="name"
-                            placeholder="Enter name"
-                            disabled
-                        />
-                    </div>
-                    <div class="form-group p-2">
-                        <label for="exampleInputEmail1">Email address</label>
-                        <input
-                            type="email"
-                            class="form-control"
-                            id="exampleInputEmail1"
-                            value={user.email}
-                            name="email"
-                            placeholder="Enter email"
-                            disabled
-                        />
-                    </div>
-                    <div class="form-group p-2">
-                        <label for="exampleInputMobile1">Mobile</label>
-                        <input
-                            type="text"
-                            class="form-control"
-                            id="exampleInputMobile1"
-                            value={user.mobile}
-                            name="mobile"
-                            placeholder="Enter mobile number"
-                            disabled
-                        />
-                    </div>
-                    <div class="form-group p-2">
-                        <label for="exampleInputPriority1">Select Priority</label>
-                        <select
-                            class="form-control"
-                            id="exampleInputPriority1"
-                            name="priority"
-                            value={user.priority}
-                            disabled
-                        >
-                            <option value="low">Low</option>
-                            <option value="medium">Medium</option>
-                            <option value="high">High</option>
-                        </select>
-                    </div>
-                    <div class="form-group p-2">
-                        <label for="exampleInputQuery1">Query</label>
-                        <textarea
-                            class="form-control"
-                            name="query"
-                            id="exampleInputQuery1"
-                            value={user.query}
-                            placeholder="Enter your query here..."
-                            disabled
-                        ></textarea>
-                    </div>
-                    <div class="form-group p-2">
-                        <label for="exampleInputReply1">Remarks</label>
-                        <textarea
-                            class="form-control"
-                            name="remark"
-                            id="exampleInputReply1"
-                            value={user.remark}
-                            onChange={inputHandler}
-                            placeholder="Enter your remark here..."
-                        ></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary m-3">Update</button>
-                </form>
+    return (
+<div>
+  <Header />
+  <div className="container my-5">
+    <h6 className="d-flex justify-content-center">Update Ticket</h6>
+
+    <div className="d-flex justify-content-center align-items-center">
+      <div className="col-md-8 col-lg-6 border rounded p-4 shadow-sm bg-white">
+        <form onSubmit={submitForm}>
+          <table className="table table-bordered">
+            <tbody>
+              <tr>
+                <th scope="row" className="w-50 fw-bold">Name:</th>
+                <td className="text-secondary">{user.name}</td>
+              </tr>
+
+              <tr>
+                <th scope="row" className="fw-bold">Email:</th>
+                <td className="text-secondary">{user.email}</td>
+              </tr>
+
+              <tr>
+                <th scope="row" className="fw-bold">Mobile:</th>
+                <td className="text-secondary">{user.mobile}</td>
+              </tr>
+
+              <tr>
+                <th scope="row" className="fw-bold">Priority:</th>
+                <td className="text-secondary">
+                  {user.priority === 1 ? "Low" : user.priority === 2 ? "Medium" : "High"}
+                </td>
+              </tr>
+
+              <tr>
+                <th scope="row" className="fw-bold">Query:</th>
+                <td className="text-secondary">{user.query}</td>
+              </tr>
+
+              <tr>
+                <th scope="row" className="fw-bold">Remarks:</th>
+                <td>
+                  {user.status == 1 ? (
+                    <span className="text-secondary">{user.remark}</span>
+                  ) : (
+                    <textarea
+                      className="form-control"
+                      name="remark"
+                      id="exampleInputReply1"
+                      onChange={inputHandler}
+                      placeholder="Enter your remark here..."
+                    ></textarea>
+                  )}
+                </td>
+              </tr>
+
+              { user.status === 1 && (
+                <tr>
+                  <th scope="row" className="fw-bold">Closed Date:</th>
+                  <td>
+                    {formatDate(user.updatedAt)}
+                  </td>
+                </tr>
+                )}
+
+              <tr>
+                <th scope="row" className="fw-bold">Status:</th>
+                <td className={`${user.status === 1 ? "text-success" : "text-danger"}`}>
+                  {user.status === 1 ? "Closed" : "Pending"}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          {user.status === 0 && (
+            <div className="d-flex justify-content-center">
+              <button type="submit" className="btn btn-primary mt-3">
+                Update
+              </button>
             </div>
-        </div>
-    </div>        </div>
+          )}
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+      
     )
 }
 

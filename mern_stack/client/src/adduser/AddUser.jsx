@@ -9,22 +9,51 @@ const AddUser = () => {
         name: "",
         email: "",
         mobile: "",
-        priority: "",
+        priority: "1",
         query: ""
     };
 
+
+
     const [user, setUser] = useState(users)
+    const [errors,setErrors] = useState({
+        name:false,
+        email:false,
+        mobile:false,
+        query:false
+    });
 
     const navigate = useNavigate();
 
     const inputHandler = (e) => {
         const { name, value } = e.target
         setUser({ ...user, [name]: value });
+
+        if(value.trim() !== ""){
+            setErrors({...errors,[name]:false});
+        }
+   
     };
 
     const submitForm = async (e) => {
 
         e.preventDefault();
+
+        const newErrors =  {
+            name: user.name.trim() === "",
+            email: user.email.trim() === "",
+            mobile:user.mobile.trim() === "",
+            query:user.query.trim() === ""
+        };
+
+        console.log('new errors '+ Object.values(newErrors).some(error => error));
+
+        setErrors(newErrors);
+
+        if(Object.values(newErrors).some(error => error)){
+            return;
+        }
+
         await axios.post("http://localhost:8000/api/user", user)
             .then((response) => {
                 toast.success(response.data.message, { position: "top-right" });
@@ -52,8 +81,11 @@ const AddUser = () => {
                                 onChange={inputHandler}
                                 name="name"
                                 placeholder="Enter name"
-                                required
+                                
                             />
+                            {errors.name && (
+                                <span class="text-danger" id="error_name">* Please enter your name.</span>
+                            )}
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputEmail" class="form-label">Email address</label>
@@ -64,9 +96,13 @@ const AddUser = () => {
                                 onChange={inputHandler}
                                 name="email"
                                 placeholder="Enter email"
-                                required
+                                
                             />
+                            {errors.email && (
+                                <span class="text-danger">* Please enter your email.</span>
+                            )}
                         </div>
+
                         <div class="mb-3">
                             <label for="exampleInputMobile" class="form-label">Mobile</label>
                             <input
@@ -76,8 +112,12 @@ const AddUser = () => {
                                 onChange={inputHandler}
                                 name="mobile"
                                 placeholder="Enter mobile number"
-                                required
+                                
                             />
+                            {errors.mobile && (
+                                <span class="text-danger">* Please enter your mobile number.</span>
+                            )}
+
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputPriority" class="form-label">Select Priority</label>
@@ -86,11 +126,11 @@ const AddUser = () => {
                                 id="exampleInputPriority"
                                 name="priority"
                                 onChange={inputHandler}
-                                required
+                                
                             >
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
+                                <option value="1">Low</option>
+                                <option value="2">Medium</option>
+                                <option value="3">High</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -102,8 +142,14 @@ const AddUser = () => {
                                 onChange={inputHandler}
                                 placeholder="Enter your query here..."
                                 rows="4"
-                                required
+                                
                             ></textarea>
+                            {
+                                errors.query && (
+                                    <span class="text-danger" id="error_query">* Please enter your query.</span>
+                                )
+                            }
+
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Submit</button>

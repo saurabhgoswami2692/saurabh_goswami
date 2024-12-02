@@ -1,23 +1,55 @@
 import React, { useState } from "react";
-import Header from "../header/Header";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const Login = () => {
+const Login = ({setIsAuthenticated}) => {
 
-    const [member,setMember] = useState([]);
+    const members = {
+        email: "",
+        password: ""
+    };
+
+    const [member,setMember] = useState(members);
+    const [errors,setErrors] = useState({
+        email:false,
+        password: false,
+    });
     const navigate = useNavigate();
+
+    
 
     const inputHandler = (e) => {
         const { name, value } = e.target
         setMember({ ...member, [name]: value });
+
+        if(value.trim() !== ''){
+            setErrors({...errors,[name]:false});
+        }
     }
 
     const loginData = async(e) => {
         e.preventDefault();
+
+        console.log(member);
+
+
+        const newErrors = {
+            email: member.email.trim() === "",
+            password: member.password.trim() === ""
+        };
+
+        setErrors(newErrors);
+
+        if(Object.values(newErrors).some(error => error)){
+            return;
+        }
+
+
         await axios.post("http://localhost:8000/api/login",member, {withCredentials: true})
         .then((response)=>{
+            setIsAuthenticated(true);
+            localStorage.setItem('isAuthenticated','true');
             toast.success(response.data.message, {position:"top-center"});
             navigate('/dashboard');
         })
@@ -45,8 +77,12 @@ const Login = () => {
                                 name="email"
                                 onChange={inputHandler}
                                 placeholder="Enter email"
-                                required
+                                
                             />
+                            {errors.email && (
+                                <span class="text-danger">* Please enter your email.</span>
+                            )}
+
                         </div>
                         <div class="mb-3">
                             <label for="exampleInputPassword" class="form-label">Password</label>
@@ -57,8 +93,12 @@ const Login = () => {
                                 name="password"
                                 onChange={inputHandler}
                                 placeholder="Enter password"
-                                required
+                                
                             />
+                            {errors.password && (
+                                <span class="text-danger">* Please enter password.</span>
+                            )}
+
                         </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Submit</button>
